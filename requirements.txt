@@ -2,4 +2,3 @@ streamlit>=1.18.0
 google-genai>=0.2.0
 Pillow>=9.4.0
 rich>=10.14.0
-base64==1.0.0
