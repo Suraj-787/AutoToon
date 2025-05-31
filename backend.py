@@ -7,6 +7,9 @@ from concurrent.futures import ThreadPoolExecutor
 import os
 import streamlit as st
 
+# === Ensure image directory exists ===
+os.makedirs("image", exist_ok=True)
+
 # === Initialize Gemini client ===
 def init_client(api_key):
     if not api_key or not isinstance(api_key, str):
@@ -14,8 +17,7 @@ def init_client(api_key):
     try:
         return genai.Client(api_key=api_key)
     except Exception as e:
-        st.error(f"❌ Failed to initialize Gemini client: {str(e)}")
-        raise ValueError(f"Failed to initialize Gemini client: {str(e)}")
+        raise ValueError(f"❌ Failed to initialize Gemini client: {str(e)}")
 
 # === Split story into scenes ===
 def split_story_into_scenes(story, max_words_per_scene=35):
@@ -51,8 +53,7 @@ def generate_style_guide(client, story, user_style):
         )
         return ''.join(part.text for part in response.candidates[0].content.parts)
     except Exception as e:
-        st.error(f"❌ Error generating style guide: {e}")
-        return ""
+        return ""  # Don't use st.error here, handle outside
 
 # === Prompt generation in parallel ===
 def generate_single_panel_prompt(args):
@@ -75,9 +76,8 @@ def generate_single_panel_prompt(args):
             ]
         )
         return ''.join(part.text for part in response.candidates[0].content.parts)
-    except Exception as e:
-        st.error(f"[Prompt Error] Scene {idx}: {e}")
-        return ""
+    except Exception:
+        return ""  # Skip this prompt on error
 
 def generate_panel_prompts_parallel(client, scenes, style_guide, user_style):
     args = []
@@ -104,9 +104,8 @@ def generate_single_comic_panel(args):
                 path = f"image/scene_{idx}.png"
                 image.save(path)
                 return path
-    except Exception as e:
-        st.error(f"[Image Error] Scene {idx}: {e}")
-    return None
+    except Exception:
+        return None  # Skip image on error
 
 def generate_comic_panels_parallel(client, panel_prompts):
     args = [(i, prompt, client) for i, prompt in enumerate(panel_prompts)]
@@ -132,8 +131,7 @@ def create_comic_pdf(image_paths, dpi=100):
         )
         return output_path
     except Exception as e:
-        st.error(f"❌ PDF creation error: {str(e)}")
-        return None
+        return None  # Handle error in app
 
 # === Exported functions ===
 __all__ = [
@@ -144,5 +142,3 @@ __all__ = [
     "generate_comic_panels_parallel",
     "create_comic_pdf"
 ]
-
-
