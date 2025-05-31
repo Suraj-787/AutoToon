@@ -7,8 +7,6 @@ from concurrent.futures import ThreadPoolExecutor
 import os
 import streamlit as st
 
-# === Ensure image directory exists ===
-os.makedirs("image", exist_ok=True)
 
 # === Initialize Gemini client ===
 def init_client(api_key):
@@ -101,7 +99,7 @@ def generate_single_comic_panel(args):
             if hasattr(part, "inline_data") and part.inline_data and part.inline_data.data:
                 image_data = base64.b64decode(part.inline_data.data)
                 image = Image.open(BytesIO(image_data))
-                path = f"image/scene_{idx}.png"
+                path = f"scene_{idx}.png"
                 image.save(path)
                 return path
     except Exception:
@@ -120,7 +118,7 @@ def create_comic_pdf(image_paths, dpi=100):
             raise ValueError("No images generated")
         width, height = scene_images[0].size
         standardized_images = [img.resize((width, height)) for img in scene_images]
-        output_path = "image/comic_book.pdf"
+        output_path = "comic_book.pdf"
         standardized_images[0].save(
             output_path,
             save_all=True,

@@ -44,29 +44,29 @@ def main():
             st.warning("⚠️ Invalid API key. Please check your Gemini API key and try again.")
             st.stop()
 
-        with st.spinner("1️⃣ Splitting story into scenes..."):
+        with st.spinner("Splitting story into scenes..."):
             scenes = split_story_into_scenes(story, max_words)
         st.write(f"✂️ Detected {len(scenes)} scenes.")
 
-        with st.spinner("2️⃣ Creating style guide..."):
+        with st.spinner("Creating style guide..."):
             style_guide = generate_style_guide(client, story, style)
         if not style_guide:
             st.error("❌ Failed to generate style guide. Please try again.")
             st.stop()
 
-        with st.spinner("3️⃣ Generating panel prompts (parallel)..."):
+        with st.spinner("Generating panel prompts (parallel)..."):
             panel_prompts = generate_panel_prompts_parallel(client, scenes, style_guide, style)
         if not any(panel_prompts):
             st.error("❌ Failed to generate any panel prompts. Please try again.")
             st.stop()
 
-        with st.spinner("4️⃣ Drawing comic panels (parallel)..."):
+        with st.spinner("Drawing comic panels (parallel)..."):
             image_paths = generate_comic_panels_parallel(client, panel_prompts)
         if not image_paths:
             st.error("❌ Failed to generate any comic panels. Please try again.")
             st.stop()
 
-        with st.spinner("5️⃣ Compiling PDF..."):
+        with st.spinner("Compiling PDF..."):
             pdf_path = create_comic_pdf(image_paths, dpi)
         if not pdf_path:
             st.error("❌ Failed to create PDF. Please try again.")
